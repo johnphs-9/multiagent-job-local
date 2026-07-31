@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "multiagent-job-interviewer"
+version = "0.2.3"
+description = "A local-first multi-agent job interview coach built with CrewAI and Ollama."
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+dependencies = [
+  "crewai[litellm]>=1.15.5,<2",
+  "ddgs>=9.14,<10",
+  "fastapi>=0.115,<1",
+  "json-repair>=0.25,<1",
+  "pypdf>=5,<7",
+  "python-dotenv>=1.0,<2",
+  "python-docx>=1.1,<2",
+  "python-multipart>=0.0.20,<1",
+  "uvicorn[standard]>=0.34,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx>=0.28,<1",
+  "pytest>=8,<10",
+  "ruff>=0.9,<1",
+]
+
+[project.scripts]
+job-interviewer = "job_interviewer.main:run"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/job_interviewer"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

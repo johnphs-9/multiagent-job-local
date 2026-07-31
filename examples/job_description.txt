@@ -1,0 +1,14 @@
+Senior Data Scientist
+
+We are looking for a data scientist who can translate business questions into
+measurable machine-learning solutions. The role partners with product and engineering,
+builds and evaluates predictive models, communicates trade-offs to non-technical
+stakeholders, and helps improve production ML practices.
+
+Requirements:
+- Strong Python, SQL, statistics, and supervised machine learning
+- Experience evaluating models and avoiding data leakage
+- Clear stakeholder communication
+- Familiarity with deployment, monitoring, and experimentation
+- Ability to mentor teammates and work across functions
+

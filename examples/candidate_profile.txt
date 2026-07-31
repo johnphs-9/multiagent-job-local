@@ -1,0 +1,11 @@
+Data analyst with four years of experience in financial-services analytics.
+
+- Built Python and SQL pipelines used for monthly risk reporting.
+- Developed a churn model in a course capstone and compared logistic regression,
+  random forest, and gradient boosting using cross-validation.
+- Presented dashboards and recommendations to operations leaders.
+- Automated a manual reporting workflow, reducing preparation time by 30%.
+- Comfortable with pandas, scikit-learn, Tableau, and Git.
+- Limited direct ownership of production model deployment and monitoring.
+- Mentored two new analysts on SQL review and dashboard standards.
+

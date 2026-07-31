@@ -1,0 +1,254 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Interview Atelier local HTML deployment architecture</title>
+  <desc id="desc">Detailed architecture of the React browser interface, FastAPI and Uvicorn application, in-memory job runtime, CrewAI workflow, local Ollama inference, local files, and optional web-search egress.</desc>
+  <defs>
+    <linearGradient id="pageGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F9F7FC"/>
+      <stop offset="100%" stop-color="#F2EEF8"/>
+    </linearGradient>
+    <linearGradient id="headerGradient" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3C1F62"/>
+      <stop offset="100%" stop-color="#6E4295"/>
+    </linearGradient>
+    <linearGradient id="apiGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FCFBFE"/>
+      <stop offset="100%" stop-color="#F5F0FA"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#2E1B45" flood-opacity="0.14"/>
+    </filter>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#2E1B45" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arrowPurple" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5B347F"/>
+    </marker>
+    <marker id="arrowTeal" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#147A73"/>
+    </marker>
+    <marker id="arrowAmber" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#B76A00"/>
+    </marker>
+    <style>
+      .title { font: 700 34px Inter, "Segoe UI", Arial, sans-serif; fill: #FFFFFF; }
+      .subtitle { font: 400 17px Inter, "Segoe UI", Arial, sans-serif; fill: #EDE5F5; }
+      .zone-title { font: 700 19px Inter, "Segoe UI", Arial, sans-serif; fill: #3C1F62; }
+      .zone-note { font: 500 13px Inter, "Segoe UI", Arial, sans-serif; fill: #6E5B7D; }
+      .card-title { font: 700 18px Inter, "Segoe UI", Arial, sans-serif; fill: #2F1D3C; }
+      .card-subtitle { font: 600 13px Inter, "Segoe UI", Arial, sans-serif; fill: #694886; letter-spacing: 0.35px; }
+      .label { font: 600 14px Inter, "Segoe UI", Arial, sans-serif; fill: #302639; }
+      .body { font: 400 13px Inter, "Segoe UI", Arial, sans-serif; fill: #51475A; }
+      .small { font: 400 12px Inter, "Segoe UI", Arial, sans-serif; fill: #61566B; }
+      .micro { font: 600 11px Inter, "Segoe UI", Arial, sans-serif; fill: #5B347F; letter-spacing: 0.25px; }
+      .mono { font: 500 12px "SFMono-Regular", Consolas, "Liberation Mono", monospace; fill: #3F3150; }
+      .white-label { font: 700 15px Inter, "Segoe UI", Arial, sans-serif; fill: #FFFFFF; }
+      .white-small { font: 400 12px Inter, "Segoe UI", Arial, sans-serif; fill: #F4EFF8; }
+      .flow-label { font: 600 12px Inter, "Segoe UI", Arial, sans-serif; fill: #4D3560; }
+      .flow-label-amber { font: 600 12px Inter, "Segoe UI", Arial, sans-serif; fill: #8F5100; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1000" fill="url(#pageGradient)"/>
+  <rect x="0" y="0" width="1600" height="108" fill="url(#headerGradient)"/>
+  <circle cx="1510" cy="18" r="98" fill="#F4B942" opacity="0.14"/>
+  <circle cx="1455" cy="94" r="58" fill="#FFFFFF" opacity="0.06"/>
+  <text x="50" y="47" class="title">Interview Atelier — local HTML deployment</text>
+  <text x="50" y="78" class="subtitle">Single-machine, local-first runtime • React UI + FastAPI orchestration + Ollama inference</text>
+  <rect x="1322" y="36" width="222" height="37" rx="18.5" fill="#F4B942"/>
+  <text x="1433" y="60" text-anchor="middle" class="label" fill="#382244">PRESENTATION VIEW</text>
+
+  <!-- Local trust boundary -->
+  <rect x="34" y="133" width="1532" height="654" rx="25" fill="#FFFFFF" stroke="#8B6AA6" stroke-width="2.5" stroke-dasharray="10 7"/>
+  <rect x="57" y="117" width="270" height="34" rx="17" fill="#EFE8F6" stroke="#8B6AA6"/>
+  <text x="192" y="140" text-anchor="middle" class="zone-title">LOCAL WORKSTATION</text>
+  <text x="1530" y="151" text-anchor="end" class="zone-note">JD/CV text and model inference remain on this machine</text>
+
+  <!-- Browser -->
+  <g filter="url(#shadow)">
+    <rect x="68" y="179" width="300" height="688" rx="20" fill="#FFFFFF" stroke="#D8CCE3" stroke-width="1.5"/>
+    <rect x="68" y="179" width="300" height="58" rx="20" fill="#F1EAF7"/>
+    <rect x="68" y="217" width="300" height="20" fill="#F1EAF7"/>
+  </g>
+  <circle cx="94" cy="207" r="5" fill="#D66A6A"/>
+  <circle cx="111" cy="207" r="5" fill="#DFAE40"/>
+  <circle cx="128" cy="207" r="5" fill="#5AA987"/>
+  <rect x="146" y="195" width="192" height="24" rx="12" fill="#FFFFFF" stroke="#D8CCE3"/>
+  <text x="242" y="211" text-anchor="middle" class="mono">127.0.0.1:8000</text>
+  <text x="90" y="269" class="card-title">Browser — React SPA</text>
+  <text x="90" y="291" class="card-subtitle">HTML5 • TYPESCRIPT • FETCH API</text>
+
+  <rect x="89" y="318" width="258" height="104" rx="12" fill="#FAF8FC" stroke="#E2D8EA"/>
+  <text x="106" y="342" class="label">Evidence intake</text>
+  <text x="106" y="366" class="body">• JD file + CV/profile + notes</text>
+  <text x="106" y="388" class="body">• profile, focus, research consent</text>
+  <text x="106" y="408" class="small">TXT / MD / PDF / DOCX • 10 MB each</text>
+
+  <rect x="89" y="438" width="258" height="125" rx="12" fill="#FAF8FC" stroke="#E2D8EA"/>
+  <text x="106" y="462" class="label">Workspace</text>
+  <text x="106" y="486" class="body">• company research + job fit</text>
+  <text x="106" y="508" class="body">• tailored questions + coaching</text>
+  <text x="106" y="530" class="body">• stage-aware job progress</text>
+  <text x="106" y="550" class="small">session ID retained in sessionStorage</text>
+
+  <rect x="89" y="579" width="258" height="104" rx="12" fill="#FAF8FC" stroke="#E2D8EA"/>
+  <text x="106" y="603" class="label">API interaction</text>
+  <text x="106" y="627" class="body">POST session / plan / answers</text>
+  <text x="106" y="649" class="body">Poll GET /jobs/{id}</text>
+  <text x="106" y="671" class="body">GET plan, report, MD or JSON</text>
+
+  <rect x="89" y="702" width="258" height="129" rx="12" fill="#F5F1F8" stroke="#CDBBDD"/>
+  <text x="106" y="727" class="label">Browser-held state only</text>
+  <text x="106" y="751" class="body">Rendered results + selected IDs</text>
+  <text x="106" y="773" class="body">No model credentials</text>
+  <text x="106" y="795" class="body">No durable document storage</text>
+  <text x="106" y="817" class="small">Refresh can restore an active server session</text>
+
+  <!-- FastAPI/Uvicorn process -->
+  <g filter="url(#shadow)">
+    <rect x="414" y="179" width="782" height="688" rx="20" fill="url(#apiGradient)" stroke="#6D4890" stroke-width="2"/>
+    <rect x="414" y="179" width="782" height="62" rx="20" fill="#5B347F"/>
+    <rect x="414" y="220" width="782" height="21" fill="#5B347F"/>
+  </g>
+  <text x="442" y="206" class="white-label">Application process</text>
+  <text x="442" y="227" class="white-small">Uvicorn • FastAPI • one Python process • localhost:8000</text>
+  <rect x="1014" y="194" width="154" height="30" rx="15" fill="#FFFFFF" opacity="0.16"/>
+  <text x="1091" y="214" text-anchor="middle" class="white-small">same-origin HTTP</text>
+
+  <!-- Delivery + API boundary -->
+  <rect x="442" y="265" width="230" height="126" rx="14" fill="#FFFFFF" stroke="#D6C7E2" filter="url(#softShadow)"/>
+  <text x="462" y="291" class="card-title">Static site delivery</text>
+  <text x="462" y="314" class="body">frontend/dist/index.html</text>
+  <text x="462" y="336" class="body">hashed JS + CSS assets</text>
+  <text x="462" y="358" class="body">SPA route fallback</text>
+  <rect x="462" y="369" width="188" height="4" rx="2" fill="#F4B942"/>
+
+  <rect x="692" y="265" width="476" height="126" rx="14" fill="#FFFFFF" stroke="#D6C7E2" filter="url(#softShadow)"/>
+  <text x="713" y="291" class="card-title">REST API boundary — /api/v1</text>
+  <text x="713" y="316" class="body">Upload extraction + input/schema validation</text>
+  <text x="713" y="338" class="body">Session, plan-job, answer-job, status, report, download routes</text>
+  <text x="713" y="360" class="body">Rate limiting • idempotency keys • safe public errors • health/config</text>
+  <rect x="713" y="373" width="426" height="4" rx="2" fill="#F4B942"/>
+
+  <!-- Runtime -->
+  <rect x="442" y="414" width="726" height="139" rx="14" fill="#EEE8F5" stroke="#B49BC8"/>
+  <text x="463" y="441" class="card-title">Ephemeral runtime state</text>
+  <text x="463" y="463" class="card-subtitle">THREAD-SAFE RUNTIMESTATE — NO DATABASE</text>
+
+  <rect x="463" y="480" width="211" height="51" rx="10" fill="#FFFFFF" stroke="#CDBBDD"/>
+  <text x="478" y="501" class="label">Session dictionary</text>
+  <text x="478" y="519" class="small">text, plan, report • 60 min idle TTL</text>
+
+  <rect x="690" y="480" width="211" height="51" rx="10" fill="#FFFFFF" stroke="#CDBBDD"/>
+  <text x="705" y="501" class="label">Job records</text>
+  <text x="705" y="519" class="small">queued → running → terminal state</text>
+
+  <rect x="917" y="480" width="230" height="51" rx="10" fill="#FFFFFF" stroke="#CDBBDD"/>
+  <text x="932" y="501" class="label">Bounded executor</text>
+  <text x="932" y="519" class="small">1 worker + 5 queued by default</text>
+
+  <!-- Domain -->
+  <rect x="442" y="576" width="726" height="259" rx="14" fill="#FFFFFF" stroke="#D6C7E2"/>
+  <text x="463" y="603" class="card-title">Domain and agent workflow</text>
+  <text x="463" y="624" class="card-subtitle">SYNCHRONOUS WORK RUNS OFF THE HTTP EVENT LOOP</text>
+
+  <rect x="463" y="646" width="155" height="82" rx="11" fill="#F8F5FA" stroke="#D9CCE4"/>
+  <text x="478" y="669" class="label">1. Prepare input</text>
+  <text x="478" y="691" class="small">document extraction</text>
+  <text x="478" y="709" class="small">Pydantic ceilings</text>
+
+  <rect x="632" y="646" width="250" height="82" rx="11" fill="#F8F5FA" stroke="#D9CCE4"/>
+  <text x="647" y="669" class="label">2. Preparation Crew</text>
+  <text x="647" y="691" class="small">identity → research → JD analysis</text>
+  <text x="647" y="709" class="small">→ structured interview questions</text>
+
+  <rect x="896" y="646" width="250" height="82" rx="11" fill="#F8F5FA" stroke="#D9CCE4"/>
+  <text x="911" y="669" class="label">3. Answer Flow</text>
+  <text x="911" y="691" class="small">draft → evaluate → revise weak answers</text>
+  <text x="911" y="709" class="small">bounded by profile (maximum 3 cycles)</text>
+
+  <path d="M 618 687 L 628 687" stroke="#5B347F" stroke-width="2" marker-end="url(#arrowPurple)"/>
+  <path d="M 882 687 L 892 687" stroke="#5B347F" stroke-width="2" marker-end="url(#arrowPurple)"/>
+
+  <rect x="463" y="748" width="683" height="65" rx="11" fill="#F4F8F7" stroke="#99C7C1"/>
+  <text x="478" y="773" class="label">Deterministic guardrails and output</text>
+  <text x="478" y="795" class="body">JSON repair + schema validation • normalization • fit/quality metrics • Markdown/JSON rendering</text>
+
+  <!-- Local Ollama -->
+  <g filter="url(#shadow)">
+    <rect x="1267" y="179" width="299" height="350" rx="20" fill="#FFFFFF" stroke="#3D8D87" stroke-width="2"/>
+    <rect x="1267" y="179" width="299" height="62" rx="20" fill="#147A73"/>
+    <rect x="1267" y="220" width="299" height="21" fill="#147A73"/>
+  </g>
+  <text x="1293" y="206" class="white-label">Local model service</text>
+  <text x="1293" y="227" class="white-small">Ollama • localhost:11434</text>
+  <text x="1291" y="274" class="card-title">OpenAI-compatible inference</text>
+  <text x="1291" y="301" class="body">CrewAI → LiteLLM adapter</text>
+  <text x="1291" y="323" class="body">HTTP requests stay on loopback</text>
+  <text x="1291" y="345" class="body">2 retries • 600 s timeout</text>
+  <rect x="1291" y="368" width="250" height="47" rx="10" fill="#EEF7F6" stroke="#99C7C1"/>
+  <text x="1306" y="389" class="label">Preview</text>
+  <text x="1390" y="389" class="mono">llama3.2:latest</text>
+  <rect x="1291" y="425" width="250" height="47" rx="10" fill="#EEF7F6" stroke="#99C7C1"/>
+  <text x="1306" y="446" class="label">Demo</text>
+  <text x="1390" y="446" class="mono">gemma4:latest</text>
+  <text x="1291" y="499" class="small">Deep profile: gemma4:26b (optional)</text>
+
+  <!-- Local filesystem/config -->
+  <g filter="url(#softShadow)">
+    <rect x="1267" y="557" width="299" height="210" rx="18" fill="#FFFFFF" stroke="#9C83B2" stroke-width="1.5"/>
+  </g>
+  <text x="1291" y="589" class="card-title">Local files and configuration</text>
+  <text x="1291" y="617" class="mono">.env</text>
+  <text x="1353" y="617" class="small">models, profile, limits</text>
+  <text x="1291" y="645" class="mono">frontend/dist/</text>
+  <text x="1407" y="645" class="small">built HTML assets</text>
+  <text x="1291" y="673" class="mono">examples/</text>
+  <text x="1371" y="673" class="small">safe sample inputs</text>
+  <line x1="1291" y1="694" x2="1541" y2="694" stroke="#E3D9EB"/>
+  <text x="1291" y="718" class="body">Uploads are read in-request, converted</text>
+  <text x="1291" y="739" class="body">to text, then original bytes are discarded.</text>
+
+  <!-- Optional external service -->
+  <g filter="url(#softShadow)">
+    <rect x="1267" y="808" width="299" height="126" rx="18" fill="#FFF9EE" stroke="#D68A1D" stroke-width="2" stroke-dasharray="7 5"/>
+  </g>
+  <text x="1291" y="837" class="card-title">Optional internet egress</text>
+  <text x="1291" y="861" class="card-subtitle" fill="#9A5A00">ONLY WHEN WEB RESEARCH IS ENABLED</text>
+  <text x="1291" y="887" class="body">DDGS text/news search</text>
+  <text x="1291" y="909" class="body">Company name/query leaves the machine</text>
+
+  <!-- Cross-component arrows -->
+  <path d="M 368 305 C 390 305, 394 306, 410 306" fill="none" stroke="#5B347F" stroke-width="2.4" marker-end="url(#arrowPurple)"/>
+  <text x="389" y="307" text-anchor="middle" class="flow-label" transform="rotate(-90 389 307)">① static assets</text>
+
+  <path d="M 410 354 C 395 354, 389 620, 368 620" fill="none" stroke="#5B347F" stroke-width="2.4" marker-end="url(#arrowPurple)"/>
+  <text x="388" y="491" text-anchor="middle" class="flow-label" transform="rotate(-90 388 491)">② JSON / progress / downloads</text>
+
+  <path d="M 805 391 L 805 410" fill="none" stroke="#5B347F" stroke-width="2.2" marker-end="url(#arrowPurple)"/>
+  <text x="824" y="405" class="flow-label">③ validate + enqueue</text>
+
+  <path d="M 805 553 L 805 572" fill="none" stroke="#5B347F" stroke-width="2.2" marker-end="url(#arrowPurple)"/>
+  <text x="824" y="568" class="flow-label">④ execute + persist result</text>
+
+  <path d="M 1168 684 C 1227 684, 1206 354, 1263 354" fill="none" stroke="#147A73" stroke-width="2.8" marker-end="url(#arrowTeal)"/>
+  <rect x="1177" y="476" width="80" height="42" rx="9" fill="#EEF7F6" stroke="#99C7C1"/>
+  <text x="1217" y="493" text-anchor="middle" class="flow-label" fill="#11645F">⑤ prompts</text>
+  <text x="1217" y="509" text-anchor="middle" class="small" fill="#11645F">⇄ JSON</text>
+
+  <path d="M 1267 654 L 1200 654" fill="none" stroke="#7A5A92" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrowPurple)"/>
+  <text x="1234" y="641" text-anchor="middle" class="micro">startup reads</text>
+
+  <path d="M 1168 742 C 1194 773, 1202 870, 1263 870" fill="none" stroke="#B76A00" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#arrowAmber)"/>
+  <text x="1170" y="801" class="flow-label-amber">⑥ opt-in search</text>
+
+  <!-- Operational callouts -->
+  <rect x="68" y="889" width="1098" height="63" rx="15" fill="#3C1F62"/>
+  <text x="91" y="915" class="white-label">Operational characteristics</text>
+  <text x="91" y="938" class="white-small">Single origin • one process • ephemeral memory • bounded concurrency • no database • restart clears sessions/jobs • local inference by default</text>
+
+  <!-- Footer legend -->
+  <line x1="1269" y1="968" x2="1309" y2="968" stroke="#5B347F" stroke-width="3" marker-end="url(#arrowPurple)"/>
+  <text x="1320" y="973" class="small">application/data flow</text>
+  <line x1="1440" y1="968" x2="1480" y2="968" stroke="#B76A00" stroke-width="3" stroke-dasharray="6 4" marker-end="url(#arrowAmber)"/>
+  <text x="1491" y="973" class="small">optional egress</text>
+</svg>
