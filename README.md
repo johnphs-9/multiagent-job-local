@@ -1,10 +1,16 @@
 # Interview Atelier
 
-Interview Atelier is a local-first, multi-agent application for job interview
-preparation. It combines a React/HTML interface, FastAPI orchestration, CrewAI agents,
-and local Ollama models.
+Interview Atelier is a locally hosted, multi-agent agentic application that helps candidates prepare for their job interview, by using LLM to analyse the uploaded JD & CV and summarise job-fit strength and gaps. Coaching is provided on simulated question and answers on the job requirements, company and HR-type questions to surface strong answers. 
 
-![Opening screen](assets/screenshots/Screenshot_landing.png)
+### Local inference, not shared to internet
+Job-fit analysis, and interview Q&A coaching is achieved using the locally downloaded LLM models, without sending information to the internet. 
+
+### Search Company Information shares info to internet
+Research Company feature is an optional selection which summarises relevant company information against the JD. Usage of this feature requires information on the company and job characteristics to be shared over internet.
+
+Technical implementation combines a React/HTML interface (Single Page Application), FastAPI orchestration, CrewAI agents, and local Ollama models (configurable choice of LLM models).
+
+![analysis in progress](assets/screenshots/Screenshot_landing2.png)
 
 ## What the application does
 
@@ -23,11 +29,25 @@ Specialist CrewAI agents handle company identity, research, job analysis, interv
 design, answering, and evaluation. Pydantic schemas and deterministic normalisation
 enforce structured outputs and workflow limits around the local model.
 
-![Research and fit summary](assets/screenshots/Screenshot_research_fit_summary.png)
+### Company Research & Job Fit summary metrics
 
-![Job-fit analysis](assets/screenshots/Screenshot_jobfit.png)
+![Research and fit summary](assets/screenshots/Screenshot_research_jobfit_summary.png)
 
-![Answer coaching](assets/screenshots/Screenshot_coaching_2.png)
+### Job-fit analysis
+
+![Job-fit analysis1](assets/screenshots/Screenshot_jobfit1.png)
+
+![Job-fit analysis1](assets/screenshots/Screenshot_jobfit3.png)
+
+### Coaching Interview Question & Answers
+
+![Answer coaching](assets/screenshots/Screenshot_coaching2.png)
+
+### Download Report
+
+![Answer coaching](assets/screenshots/Screenshot_coaching1.png)
+
+[sample report](assets/downloads/interview-report_qwen3.32b_CIMB.md)
 
 ## Local architecture
 
@@ -73,13 +93,32 @@ Internet access is needed for initial dependency and model downloads. Company re
 also needs internet access. With web research disabled, runtime evidence and inference
 remain on the workstation.
 
+### Project Docs
+| Filename | Description |
+| --- | --- |
+| [DESIGN.md](./DESIGN.md) | Personalised style guide (for GenAI) to create consistent visual content across interfaces, documents, and presentations. | 
+| [00-project-brief.md](docs/00-project-brief.md) | Purpose, user, principles, scope, and success criteria. |
+| [01-product-requirements.md](docs/01-product-requirements.md) | Journeys, functional requirements, local profiles, non-functional requirements, and acceptance criteria. |
+| [02-system-architecture.md](docs/02-system-architecture.md) | Runtime components, flows, trust boundaries, failure behaviour, and scalability boundary.|
+| [03-llm-and-agent-design.md](docs/03-llm-and-agent-design.md) | Ollama profiles, agents, evaluator–optimizer Flow, structured output, and evidence controls. |
+| [04-ux-design.md](docs/04-ux-design.md) | Information architecture, screens, responsive behaviour, states, accessibility, and content. |
+| [05-api-and-data-design.md](docs/05-api-and-data-design.md) | FastAPI routes, job lifecycle, validation, and contracts. |
+| [06-deployment-and-operations.md](docs/06-deployment-and-operations.md) | Scope: local deployment. Installation, build, startup, configuration, health, capacity, logging, and recovery. Removed Docker, Hugging Face Spaces, secrets, observability, and costs. |
+| [07-security-and-privacy.md](docs/07-security-and-privacy.md) | Data lifecycle, threats, controls, local binding, logging, and disclosures. |
+| [08-testing-and-quality.md](docs/08-testing-and-quality.md) | Deterministic automation, local model checks, static gates, and smoke tests. | 
+| [09-implementation-plan.md](docs/09-implementation-plan.md) | Completed baseline, maintenance workstreams, backlog, sequence, and definition of done. |
+| [10-decision-log.md](docs/10-decision-log.md) | Active architectural decisions. |
+| 11-original-prd-assessment-and-traceability | Retired post new project baseline. |
+| [12-local-html-deployment-architecture.md](docs/12-local-html-deployment-architecture.md) | Detailed topology and operational walkthrough. | 
+
+
 ## Run locally
 
 ### 1. Install the application
 
 ```bash
-git clone https://github.com/johnphs-9/multiagent-job-interviewer.git
-cd multiagent-job-interviewer
+git clone https://github.com/johnphs-9/multiagent-job-local.git
+cd multiagent-job-local
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
@@ -102,7 +141,7 @@ Confirm installed models:
 ollama list
 ```
 
-Pull the model required for the selected profile:
+Pull the model required for the selected profile (if not already installed previously):
 
 ```bash
 ollama pull llama3.2:latest
