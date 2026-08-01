@@ -11,3 +11,4 @@ output/
 frontend/dist/
 frontend/node_modules/
 frontend/*.tsbuildinfo
+DESIGN.md

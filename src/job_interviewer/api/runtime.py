@@ -18,7 +18,9 @@ from job_interviewer.schemas import InterviewPackage, InterviewReport
 
 JobState = Literal["queued", "running", "succeeded", "failed", "cancelled"]
 JobType = Literal["plan", "answers"]
-JobOperation = Callable[["SessionRecord", Callable[[str, str, int, int], None]], None]
+JobOperation = Callable[
+    ["SessionRecord", Callable[[str, str, int, int], None], threading.Event], None
+]
 LOGGER = logging.getLogger(__name__)
 
 
@@ -64,6 +66,7 @@ class JobRecord:
     finished_at: str | None = None
     error_code: str | None = None
     retryable: bool = False
+    cancel_event: threading.Event = field(default_factory=threading.Event, repr=False)
 
 
 class SessionNotFound(KeyError):
@@ -108,6 +111,11 @@ class RuntimeState:
             thread_name_prefix="interview-workflow",
         )
         self._slots = threading.BoundedSemaphore(max(1, worker_concurrency + queue_size))
+        self._started_jobs = 0
+        self._failed_jobs = 0
+        self._completed_jobs = 0
+        self._cancelled_jobs = 0
+        self._total_job_seconds = 0.0
 
     def _cleanup_locked(self) -> None:
         now = time.monotonic()
@@ -185,11 +193,28 @@ class RuntimeState:
             if session and session.active_job_id:
                 job = self._jobs.get(session.active_job_id)
                 if job and job.state == "queued":
+                    job.cancel_event.set()
                     job.state = "cancelled"
                     job.stage = "cancelled"
                     job.message = "Cancelled before execution"
                     job.finished_at = utc_now()
             self._delete_locked(session_id)
+
+    def cancel_job(self, job_id: str) -> JobRecord:
+        with self._lock:
+            job = self.get_job(job_id)
+            if job.state in {"queued", "running"}:
+                job.cancel_event.set()
+                if job.state == "queued":
+                    job.state = "cancelled"
+                    job.stage = "cancelled"
+                    job.message = "Cancelled before execution"
+                    job.finished_at = utc_now()
+                    self._cancelled_jobs += 1
+                    session = self._sessions.get(job.session_id)
+                    if session and session.active_job_id == job_id:
+                        session.active_job_id = None
+            return job
 
     def set_package(self, session_id: str, package: InterviewPackage) -> None:
         with self._lock:
@@ -242,6 +267,7 @@ class RuntimeState:
                 job_type=job_type,
             )
             self._jobs[job.job_id] = job
+            self._started_jobs += 1
             self._idempotency[key] = (digest, job.job_id)
             session.active_job_id = job.job_id
             self._executor.submit(self._run_job, job.job_id, operation)
@@ -273,7 +299,17 @@ class RuntimeState:
                 current.total_steps = max(1, total)
 
         try:
-            operation(session, progress)
+            operation(session, progress, job.cancel_event)
+            if job.cancel_event.is_set():
+                with self._lock:
+                    current = self._jobs.get(job_id)
+                    if current:
+                        current.state = "cancelled"
+                        current.stage = "cancelled"
+                        current.message = "Cancelled"
+                        current.finished_at = utc_now()
+                        self._cancelled_jobs += 1
+                return
         except Exception as exc:
             LOGGER.exception(
                 "Workflow job %s (%s) failed",
@@ -290,6 +326,7 @@ class RuntimeState:
                     current.error_code = code
                     current.retryable = retryable
                     current.finished_at = utc_now()
+                    self._failed_jobs += 1
         else:
             with self._lock:
                 current = self._jobs.get(job_id)
@@ -299,6 +336,7 @@ class RuntimeState:
                     current.message = "Workflow completed"
                     current.completed_steps = current.total_steps
                     current.finished_at = utc_now()
+                    self._completed_jobs += 1
         finally:
             with self._lock:
                 current = self._jobs.get(job_id)
@@ -307,10 +345,40 @@ class RuntimeState:
                 if session and session.active_job_id == job_id:
                     session.active_job_id = None
                     session.last_access_monotonic = time.monotonic()
+                if current and current.started_at and current.finished_at:
+                    started = datetime.fromisoformat(current.started_at)
+                    finished = datetime.fromisoformat(current.finished_at)
+                    self._total_job_seconds += (finished - started).total_seconds()
             self._slots.release()
 
+    def metrics(self) -> dict[str, int | float]:
+        with self._lock:
+            active = sum(
+                job.state in {"queued", "running"} for job in self._jobs.values()
+            )
+            failed = self._failed_jobs
+            terminal = self._completed_jobs + failed + self._cancelled_jobs
+            return {
+                "sessions": len(self._sessions),
+                "activeJobs": active,
+                "queuedJobs": sum(job.state == "queued" for job in self._jobs.values()),
+                "runningJobs": sum(job.state == "running" for job in self._jobs.values()),
+                "startedJobs": self._started_jobs,
+                "completedJobs": self._completed_jobs,
+                "failedJobs": failed,
+                "cancelledJobs": self._cancelled_jobs,
+                "failureRate": round(failed / terminal, 4) if terminal else 0.0,
+                "averageJobSeconds": (
+                    round(self._total_job_seconds / terminal, 2) if terminal else 0.0
+                ),
+            }
+
     def shutdown(self) -> None:
-        self._executor.shutdown(wait=False, cancel_futures=True)
+        with self._lock:
+            for job in self._jobs.values():
+                if job.state in {"queued", "running"}:
+                    job.cancel_event.set()
+        self._executor.shutdown(wait=True, cancel_futures=True)
 
 
 def safe_job_error(exc: Exception) -> tuple[str, str, bool]:

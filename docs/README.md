@@ -28,6 +28,8 @@ and Ollama application.
 11. [Decision log](10-decision-log.md) — active architectural decisions.
 12. [Local HTML deployment architecture](12-local-html-deployment-architecture.md) —
     presentation-ready detailed topology and operational walkthrough.
+13. [Dependency and release process](11-dependencies-and-releases.md).
+14. [CrewAI and Ollama compatibility](13-model-compatibility.md).
 
 ## Document status
 

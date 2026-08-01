@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import logging
 import secrets
 import threading
 import time
+import uuid
 from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -43,6 +45,7 @@ from job_interviewer.documents import (
     DocumentError,
     extract_document,
 )
+from job_interviewer.logging_setup import configure_logging, request_id
 from job_interviewer.render import render_report
 from job_interviewer.service import (
     build_interview_plan,
@@ -52,17 +55,20 @@ from job_interviewer.service import (
 
 API_PREFIX = "/api/v1"
 DEFAULT_FOCUS = "balanced company, role, technical, and behavioural coverage"
+MAX_COMPANY_HINT_CHARS = 240
+MAX_INTERVIEW_FOCUS_CHARS = 500
+MAX_IDEMPOTENCY_KEY_CHARS = 200
 
 
 class ExampleSessionRequest(BaseModel):
-    profile: str = "demo"
-    company_hint: str = ""
-    interview_focus: str = DEFAULT_FOCUS
+    profile: str = Field(default="demo", max_length=32)
+    company_hint: str = Field(default="", max_length=MAX_COMPANY_HINT_CHARS)
+    interview_focus: str = Field(default=DEFAULT_FOCUS, max_length=MAX_INTERVIEW_FOCUS_CHARS)
     web_research: bool = False
 
 
 class AnswerJobRequest(BaseModel):
-    selected_question_ids: list[str] = Field(min_length=1)
+    selected_question_ids: list[str] = Field(min_length=1, max_length=26)
 
 
 def _camel_key(value: str) -> str:
@@ -196,6 +202,8 @@ def _resolve_frontend_dir(settings: Settings) -> Path:
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
+    configure_logging()
+    logger = logging.getLogger("job_interviewer.api")
     base_settings = settings or Settings.from_env()
     runtime = RuntimeState(
         session_idle_minutes=base_settings.session_idle_minutes,
@@ -220,11 +228,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next):
-        response = await call_next(request)
+        correlation_id = request.headers.get("X-Request-ID") or uuid.uuid4().hex
+        token = request_id.set(correlation_id)
+        try:
+            response = await call_next(request)
+        finally:
+            logger.info("request_complete", extra={"path": request.url.path})
+            request_id.reset(token)
+        response.headers["X-Request-ID"] = correlation_id
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
         response.headers["X-Frame-Options"] = "SAMEORIGIN"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data:; connect-src 'self'; object-src 'none'; "
+            "base-uri 'self'; frame-ancestors 'self'"
+        )
         return response
 
     def client_key(request: Request) -> str:
@@ -320,14 +340,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "sessionIdleMinutes": base_settings.session_idle_minutes,
         }
 
+    @app.get(f"{API_PREFIX}/metrics")
+    async def metrics() -> dict[str, Any]:
+        """Expose local operational counters; no document or prompt data is included."""
+        return runtime.metrics()
+
     @app.post(f"{API_PREFIX}/sessions", status_code=201)
     async def create_session(
         request: Request,
         job_description: Annotated[UploadFile, File()],
         candidate_profile: Annotated[UploadFile | None, File()] = None,
         candidate_notes: Annotated[str, Form()] = "",
-        company_hint: Annotated[str, Form()] = "",
-        interview_focus: Annotated[str, Form()] = DEFAULT_FOCUS,
+        company_hint: Annotated[str, Form(max_length=MAX_COMPANY_HINT_CHARS)] = "",
+        interview_focus: Annotated[str, Form(max_length=MAX_INTERVIEW_FOCUS_CHARS)] = DEFAULT_FOCUS,
         web_research: Annotated[bool, Form()] = True,
         profile: Annotated[str, Form()] = "demo",
     ) -> dict[str, Any]:
@@ -406,10 +431,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         session = get_session_or_error(session_id)
         selected_settings = resolve_profile(session.profile)
 
-        def run_plan(
-            current: SessionRecord,
-            progress,
-        ) -> None:
+        def run_plan(current: SessionRecord, progress, cancel_event: threading.Event) -> None:
+            if cancel_event.is_set():
+                return
             status = check_ollama(
                 selected_settings.ollama_base_url,
                 selected_settings.selected_model,
@@ -430,7 +454,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
             runtime.set_package(current.session_id, package)
 
-        key = idempotency_key or secrets.token_urlsafe(18)
+        key = (idempotency_key or secrets.token_urlsafe(18)).strip()
+        if len(key) > MAX_IDEMPOTENCY_KEY_CHARS:
+            raise HTTPException(status_code=422, detail="Idempotency-Key is too long.")
         job = runtime.submit_job(
             session_id=session_id,
             job_type="plan",
@@ -480,7 +506,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 ),
             )
 
-        def run_answers(current: SessionRecord, progress) -> None:
+        def run_answers(current: SessionRecord, progress, cancel_event: threading.Event) -> None:
+            if cancel_event.is_set():
+                return
             if current.package is None:
                 raise ValueError("Interview plan is not available.")
             status = check_ollama(
@@ -498,7 +526,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
             runtime.set_report(current.session_id, report)
 
-        key = idempotency_key or secrets.token_urlsafe(18)
+        key = (idempotency_key or secrets.token_urlsafe(18)).strip()
+        if len(key) > MAX_IDEMPOTENCY_KEY_CHARS:
+            raise HTTPException(status_code=422, detail="Idempotency-Key is too long.")
         job = runtime.submit_job(
             session_id=session_id,
             job_type="answers",
@@ -519,6 +549,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def get_job(job_id: str) -> dict[str, Any]:
         try:
             return job_response(runtime.get_job(job_id))
+        except SessionNotFound as exc:
+            raise HTTPException(status_code=404, detail="Job not found.") from exc
+
+    @app.post(f"{API_PREFIX}/jobs/{{job_id}}/cancel")
+    async def cancel_job(job_id: str) -> dict[str, Any]:
+        try:
+            return job_response(runtime.cancel_job(job_id))
         except SessionNotFound as exc:
             raise HTTPException(status_code=404, detail="Job not found.") from exc
 

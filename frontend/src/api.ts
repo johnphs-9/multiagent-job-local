@@ -73,6 +73,8 @@ export const api = {
       body: JSON.stringify({ selected_question_ids: selectedQuestionIds }),
     }),
   job: (jobId: string) => request<WorkflowJob>(`/jobs/${jobId}`),
+  cancelJob: (jobId: string) =>
+    request<WorkflowJob>(`/jobs/${jobId}/cancel`, { method: "POST" }),
   report: (sessionId: string) =>
     request<InterviewReport>(`/sessions/${sessionId}/report`),
   downloadUrl: (sessionId: string, format: "md" | "json") =>

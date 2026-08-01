@@ -93,9 +93,10 @@ Internet access is needed for initial dependency and model downloads. Company re
 also needs internet access. With web research disabled, runtime evidence and inference
 remain on the workstation.
 
-### Project Docs
+### Project Documentation 
 | Filename | Description |
 | --- | --- |
+| [README.md](docs/README.md) | Recommended reading order |
 | [DESIGN.md](./DESIGN.md) | Personalised style guide (for GenAI) to create consistent visual content across interfaces, documents, and presentations. | 
 | [00-project-brief.md](docs/00-project-brief.md) | Purpose, user, principles, scope, and success criteria. |
 | [01-product-requirements.md](docs/01-product-requirements.md) | Journeys, functional requirements, local profiles, non-functional requirements, and acceptance criteria. |
@@ -108,8 +109,9 @@ remain on the workstation.
 | [08-testing-and-quality.md](docs/08-testing-and-quality.md) | Deterministic automation, local model checks, static gates, and smoke tests. | 
 | [09-implementation-plan.md](docs/09-implementation-plan.md) | Completed baseline, maintenance workstreams, backlog, sequence, and definition of done. |
 | [10-decision-log.md](docs/10-decision-log.md) | Active architectural decisions. |
-| 11-original-prd-assessment-and-traceability | Retired post new project baseline. |
+| [11-dependencies-and-releases.md](docs/11-dependencies-and-releases.md) | Dependencies and releases. |
 | [12-local-html-deployment-architecture.md](docs/12-local-html-deployment-architecture.md) | Detailed topology and operational walkthrough. | 
+| [13-model-compatibility.md](docs/13-model-compatibility.md) | LLM model compatibility. |
 
 
 ## Run locally
@@ -331,16 +333,6 @@ npm run build --prefix frontend
 ```
 
 Automated tests mock agent operations and do not call Ollama or public search.
-
-## Documentation
-
-- [Documentation index](docs/README.md)
-- [Product requirements](docs/01-product-requirements.md)
-- [System architecture](docs/02-system-architecture.md)
-- [LLM and agent design](docs/03-llm-and-agent-design.md)
-- [API and data design](docs/05-api-and-data-design.md)
-- [Local deployment and operations](docs/06-deployment-and-operations.md)
-- [Local HTML deployment architecture](docs/12-local-html-deployment-architecture.md)
 
 ## Project structure
 
