@@ -1,6 +1,6 @@
 import pytest
 
-from job_interviewer.config import Settings
+from interview_local.config import Settings
 
 
 def test_crewai_model_adds_ollama_prefix() -> None:

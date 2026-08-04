@@ -26,8 +26,8 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from job_interviewer import __version__
-from job_interviewer.api.runtime import (
+from interview_local import __version__
+from interview_local.api.runtime import (
     ActiveJobExists,
     IdempotencyConflict,
     JobRecord,
@@ -38,16 +38,16 @@ from job_interviewer.api.runtime import (
     SessionRecord,
     payload_digest,
 )
-from job_interviewer.config import Settings
-from job_interviewer.documents import (
+from interview_local.config import Settings
+from interview_local.documents import (
     MAX_FILE_BYTES,
     SUPPORTED_SUFFIXES,
     DocumentError,
     extract_document,
 )
-from job_interviewer.logging_setup import configure_logging, request_id
-from job_interviewer.render import render_report
-from job_interviewer.service import (
+from interview_local.logging_setup import configure_logging, request_id
+from interview_local.render import render_report
+from interview_local.service import (
     build_interview_plan,
     check_ollama,
     improve_interview_answers,
@@ -203,7 +203,7 @@ def _resolve_frontend_dir(settings: Settings) -> Path:
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     configure_logging()
-    logger = logging.getLogger("job_interviewer.api")
+    logger = logging.getLogger("interview_local.api")
     base_settings = settings or Settings.from_env()
     runtime = RuntimeState(
         session_idle_minutes=base_settings.session_idle_minutes,

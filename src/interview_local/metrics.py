@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 
-from job_interviewer.schemas import (
+from interview_local.schemas import (
     AnswerDraft,
     AnswerEvaluation,
     AnswerQualityMetrics,

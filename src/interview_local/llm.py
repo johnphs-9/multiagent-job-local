@@ -8,7 +8,7 @@ from typing import Any, TypeVar
 from json_repair import loads as repair_json
 from pydantic import BaseModel
 
-from job_interviewer.config import Settings
+from interview_local.config import Settings
 
 ModelT = TypeVar("ModelT", bound=BaseModel)
 

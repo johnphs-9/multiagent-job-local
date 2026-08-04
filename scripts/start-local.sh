@@ -6,6 +6,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 FRONTEND_DIR="${PROJECT_ROOT}/frontend"
 VENV_PYTHON="${PROJECT_ROOT}/.venv/bin/python"
+# Prefer this checkout over any stale editable install recorded in the virtual
+# environment. This also makes python-dotenv discover this checkout's .env.
+export PYTHONPATH="${PROJECT_ROOT}/src${PYTHONPATH:+:${PYTHONPATH}}"
 APP_HOST="${APP_HOST:-127.0.0.1}"
 APP_PORT="${APP_PORT:-8000}"
 STARTUP_TIMEOUT_SECONDS="${STARTUP_TIMEOUT_SECONDS:-30}"
@@ -191,13 +194,31 @@ import json_repair
 import multipart
 import pypdf
 import uvicorn
-import job_interviewer
+import interview_local
 PY
 then
     fail "Python application dependencies are installed" \
         'Install them with: .venv/bin/python -m pip install -e ".[dev]"'
 fi
 pass "Python application dependencies are installed"
+
+RESOLVED_SOURCE="$("${VENV_PYTHON}" - <<'PY'
+from pathlib import Path
+
+import interview_local
+
+print(Path(interview_local.__file__).resolve())
+PY
+)"
+case "${RESOLVED_SOURCE}" in
+    "${PROJECT_ROOT}/src/interview_local/"*)
+        pass "Python application source resolved from this checkout"
+        ;;
+    *)
+        fail "Python application source resolved from this checkout" \
+            "Resolved interview_local from ${RESOLVED_SOURCE}"
+        ;;
+esac
 
 command -v node >/dev/null 2>&1 \
     || fail "Node.js is available" "Install Node.js 20.19+ or 22.12+."
@@ -235,7 +256,7 @@ else
 fi
 
 if ! CONFIG_SUMMARY="$("${VENV_PYTHON}" - <<'PY'
-from job_interviewer.config import Settings
+from interview_local.config import Settings
 
 settings = Settings.from_env()
 print(settings.model_profile)
@@ -253,7 +274,7 @@ pass "Runtime profile configuration is valid: ${DEFAULT_PROFILE}"
 pass "Default Ollama model resolved: ${SELECTED_MODEL}"
 
 if ! REQUIRED_MODELS="$("${VENV_PYTHON}" - <<'PY'
-from job_interviewer.config import Settings
+from interview_local.config import Settings
 
 settings = Settings.from_env()
 if settings.ollama_model:
@@ -310,7 +331,7 @@ while IFS=$'\t' read -r model_scope required_model; do
         "${OLLAMA_BASE_URL_VALUE}" "${required_model}" <<'PY'
 import sys
 
-from job_interviewer.service import check_ollama
+from interview_local.service import check_ollama
 
 status = check_ollama(sys.argv[1], sys.argv[2])
 print(status.message)
@@ -362,6 +383,6 @@ printf 'Keep this terminal open and press Ctrl+C to stop the server.\n\n'
 
 printf 'job_interview app here: http://localhost:8000 \n\n'
 
-"${VENV_PYTHON}" -m uvicorn job_interviewer.api.app:app \
+"${VENV_PYTHON}" -m uvicorn interview_local.api.app:app \
     --host "${APP_HOST}" \
     --port "${APP_PORT}"

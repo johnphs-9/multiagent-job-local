@@ -95,7 +95,7 @@ Start the application:
 
 ```bash
 source .venv/bin/activate
-python -m uvicorn job_interviewer.api.app:app --host 127.0.0.1 --port 8000
+python -m uvicorn interview_local.api.app:app --host 127.0.0.1 --port 8000
 ```
 
 Open <http://127.0.0.1:8000>.
@@ -110,7 +110,7 @@ Run these in separate terminals:
 
 ```bash
 source .venv/bin/activate
-python -m uvicorn job_interviewer.api.app:app --reload --port 8000
+python -m uvicorn interview_local.api.app:app --reload --port 8000
 ```
 
 ```bash

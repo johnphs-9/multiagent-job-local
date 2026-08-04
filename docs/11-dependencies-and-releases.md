@@ -15,7 +15,7 @@ source snapshots, not a hosted service or a promise of multi-user support.
 
 ## Release workflow
 
-1. Update `__version__` in `src/job_interviewer/__init__.py` using semantic versioning.
+1. Update `__version__` in `src/interview_local/__init__.py` using semantic versioning.
 2. Update `CHANGELOG.md` with the release date and user-visible changes.
 3. Update `__build_tag__` or `APP_BUILD_TAG` for the demonstrable build.
 4. Run all quality checks and verify the README setup from a clean checkout.

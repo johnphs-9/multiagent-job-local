@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-from job_interviewer.config import Settings
-from job_interviewer.llm import (
+from interview_local.config import Settings
+from interview_local.llm import (
     create_llm,
     schema_instruction,
     structured_result_with_retry,
 )
-from job_interviewer.metrics import calculate_job_fit, calculate_question_quality
-from job_interviewer.progress import ProgressCallback, emit_progress
-from job_interviewer.research import collect_company_evidence
-from job_interviewer.schemas import (
+from interview_local.metrics import calculate_job_fit, calculate_question_quality
+from interview_local.progress import ProgressCallback, emit_progress
+from interview_local.research import collect_company_evidence
+from interview_local.schemas import (
     CompanyResearch,
     InterviewPackage,
     InterviewPlan,

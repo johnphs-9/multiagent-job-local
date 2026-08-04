@@ -3,7 +3,7 @@ from io import BytesIO
 import pytest
 from docx import Document
 
-from job_interviewer.documents import DocumentError, extract_document
+from interview_local.documents import DocumentError, extract_document
 
 
 def test_extract_text_document() -> None:

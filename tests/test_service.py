@@ -2,7 +2,7 @@ import io
 import json
 from urllib.error import URLError
 
-from job_interviewer.service import check_ollama
+from interview_local.service import check_ollama
 
 
 class FakeResponse(io.BytesIO):
@@ -16,7 +16,7 @@ class FakeResponse(io.BytesIO):
 def test_check_ollama_finds_model(monkeypatch) -> None:
     payload = json.dumps({"models": [{"name": "gemma4:latest"}]}).encode()
     monkeypatch.setattr(
-        "job_interviewer.service.urlopen",
+        "interview_local.service.urlopen",
         lambda *args, **kwargs: FakeResponse(payload),
     )
 
@@ -29,7 +29,7 @@ def test_check_ollama_finds_model(monkeypatch) -> None:
 def test_check_ollama_reports_missing_model(monkeypatch) -> None:
     payload = json.dumps({"models": [{"name": "llama3.2:latest"}]}).encode()
     monkeypatch.setattr(
-        "job_interviewer.service.urlopen",
+        "interview_local.service.urlopen",
         lambda *args, **kwargs: FakeResponse(payload),
     )
 
@@ -43,7 +43,7 @@ def test_check_ollama_reports_connection_failure(monkeypatch) -> None:
     def fail(*args, **kwargs):
         raise URLError("offline")
 
-    monkeypatch.setattr("job_interviewer.service.urlopen", fail)
+    monkeypatch.setattr("interview_local.service.urlopen", fail)
 
     status = check_ollama("http://localhost:11434", "gemma4:latest")
 

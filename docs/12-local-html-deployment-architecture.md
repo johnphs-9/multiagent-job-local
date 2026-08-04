@@ -70,7 +70,7 @@ Then start the HTML application from the repository root:
 
 ```bash
 source .venv/bin/activate
-python -m uvicorn job_interviewer.api.app:app --host 127.0.0.1 --port 8000
+python -m uvicorn interview_local.api.app:app --host 127.0.0.1 --port 8000
 ```
 
 At application import, `Settings.from_env()` loads `.env`, builds and validates all
@@ -236,12 +236,12 @@ verify:
 
 | Concern | Implementation |
 |---|---|
-| FastAPI routes and static delivery | `src/job_interviewer/api/app.py` |
-| Session/job runtime | `src/job_interviewer/api/runtime.py` |
-| Profiles and environment contract | `src/job_interviewer/config.py` |
-| Ollama model adapter | `src/job_interviewer/llm.py` |
-| Application use cases | `src/job_interviewer/service.py` |
-| Preparation agents | `src/job_interviewer/crew.py` |
-| Answer evaluator–optimizer flow | `src/job_interviewer/answer_flow.py` |
+| FastAPI routes and static delivery | `src/interview_local/api/app.py` |
+| Session/job runtime | `src/interview_local/api/runtime.py` |
+| Profiles and environment contract | `src/interview_local/config.py` |
+| Ollama model adapter | `src/interview_local/llm.py` |
+| Application use cases | `src/interview_local/service.py` |
+| Preparation agents | `src/interview_local/crew.py` |
+| Answer evaluator–optimizer flow | `src/interview_local/answer_flow.py` |
 | Browser API client and polling | `frontend/src/api.ts` |
 | Frontend production build | `frontend/vite.config.ts` |

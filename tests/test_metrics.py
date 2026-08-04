@@ -1,10 +1,10 @@
-from job_interviewer.metrics import (
+from interview_local.metrics import (
     calculate_answer_quality,
     calculate_job_fit,
     calculate_question_quality,
     interpret_job_fit,
 )
-from job_interviewer.schemas import (
+from interview_local.schemas import (
     AnswerDraft,
     AnswerEvaluation,
     InterviewPlan,

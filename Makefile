@@ -10,10 +10,10 @@ doctor:
 	./scripts/start-local.sh --check-only
 
 run:
-	python3 -m uvicorn job_interviewer.api.app:app --host 127.0.0.1 --port 8000
+	python3 -m uvicorn interview_local.api.app:app --host 127.0.0.1 --port 8000
 
 api:
-	python3 -m uvicorn job_interviewer.api.app:app --reload --port 8000
+	python3 -m uvicorn interview_local.api.app:app --reload --port 8000
 
 frontend:
 	cd frontend && npm run dev
@@ -22,7 +22,7 @@ build-frontend:
 	cd frontend && npm run build
 
 cli:
-	job-interviewer --jd-file examples/job_description.txt --candidate-file examples/candidate_profile.txt --output output/interview_report.md
+	interview-local --jd-file examples/job_description.txt --candidate-file examples/candidate_profile.txt --output output/interview_report.md
 
 test:
 	python3 -m pytest

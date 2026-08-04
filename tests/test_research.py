@@ -1,4 +1,4 @@
-from job_interviewer.research import collect_company_evidence
+from interview_local.research import collect_company_evidence
 
 
 def test_company_research_deduplicates_sources() -> None:

@@ -7,9 +7,9 @@ from dataclasses import dataclass
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
-from job_interviewer.config import Settings
-from job_interviewer.progress import ProgressCallback
-from job_interviewer.schemas import (
+from interview_local.config import Settings
+from interview_local.progress import ProgressCallback
+from interview_local.schemas import (
     AnswerFlowState,
     InterviewPackage,
     InterviewReport,
@@ -75,7 +75,7 @@ def build_interview_plan(
     progress: ProgressCallback | None = None,
 ) -> InterviewPackage:
     """Run identity, company research, JD analysis, and question-design agents."""
-    from job_interviewer.crew import PreparationCrew
+    from interview_local.crew import PreparationCrew
 
     _validate_inputs(job_description, candidate_profile)
     return PreparationCrew(settings, verbose=verbose, progress=progress).run(
@@ -96,7 +96,7 @@ def improve_interview_answers(
     progress: ProgressCallback | None = None,
 ) -> InterviewReport:
     """Run the bounded answer/evaluate/revise Flow."""
-    from job_interviewer.answer_flow import AnswerImprovementFlow
+    from interview_local.answer_flow import AnswerImprovementFlow
 
     if not candidate_profile.strip():
         raise ValueError("Candidate profile cannot be empty.")

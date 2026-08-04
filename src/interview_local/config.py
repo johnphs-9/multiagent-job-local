@@ -9,8 +9,8 @@ from typing import Literal
 
 from dotenv import load_dotenv
 
-from job_interviewer import __build_tag__
-from job_interviewer.schemas import WorkflowOptions
+from interview_local import __build_tag__
+from interview_local.schemas import WorkflowOptions
 
 ProfileName = Literal["preview", "demo", "deep"]
 

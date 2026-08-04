@@ -4,8 +4,8 @@ from types import SimpleNamespace
 
 from fastapi.testclient import TestClient
 
-from job_interviewer.config import Settings
-from job_interviewer.schemas import (
+from interview_local.config import Settings
+from interview_local.schemas import (
     AnswerDraft,
     AnswerEvaluation,
     CompanyResearch,
@@ -18,7 +18,7 @@ from job_interviewer.schemas import (
     WorkflowOptions,
 )
 
-api_module = importlib.import_module("job_interviewer.api.app")
+api_module = importlib.import_module("interview_local.api.app")
 
 
 def sample_package() -> InterviewPackage:

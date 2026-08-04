@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "multiagent-job-interviewer"
+name = "multiagent-interview-local"
 version = "0.2.3"
 description = "A local-first multi-agent job interview coach built with CrewAI and Ollama."
 readme = "README.md"
@@ -28,10 +28,10 @@ dev = [
 ]
 
 [project.scripts]
-job-interviewer = "job_interviewer.main:run"
+interview-local = "interview_local.main:run"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/job_interviewer"]
+packages = ["src/interview_local"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

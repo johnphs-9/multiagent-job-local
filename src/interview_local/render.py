@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from job_interviewer.schemas import InterviewPackage, InterviewReport
+from interview_local.schemas import InterviewPackage, InterviewReport
 
 
 def render_plan(package: InterviewPackage) -> str:

@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Literal
 
-from job_interviewer.schemas import InterviewPackage, InterviewReport
+from interview_local.schemas import InterviewPackage, InterviewReport
 
 JobState = Literal["queued", "running", "succeeded", "failed", "cancelled"]
 JobType = Literal["plan", "answers"]

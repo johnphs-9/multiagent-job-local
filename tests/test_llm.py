@@ -1,11 +1,11 @@
-from job_interviewer.config import Settings
-from job_interviewer.llm import (
+from interview_local.config import Settings
+from interview_local.llm import (
     create_llm,
     schema_instruction,
     structured_result,
     structured_result_with_retry,
 )
-from job_interviewer.schemas import InterviewPlan
+from interview_local.schemas import InterviewPlan
 
 
 class RawResult:

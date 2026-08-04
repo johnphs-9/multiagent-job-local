@@ -1,4 +1,4 @@
-from job_interviewer.schemas import (
+from interview_local.schemas import (
     InterviewPlan,
     InterviewQuestion,
     JDAnalysis,

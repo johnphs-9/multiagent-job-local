@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from job_interviewer.schemas import SearchBundle, SearchSource
+from interview_local.schemas import SearchBundle, SearchSource
 
 SearchCallable = Callable[..., list[dict[str, Any]]]
 

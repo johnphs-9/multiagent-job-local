@@ -7,15 +7,15 @@ from typing import Protocol
 
 from crewai.flow.flow import Flow, start
 
-from job_interviewer.config import Settings
-from job_interviewer.llm import (
+from interview_local.config import Settings
+from interview_local.llm import (
     create_llm,
     schema_instruction,
     structured_result_with_retry,
 )
-from job_interviewer.metrics import calculate_answer_quality
-from job_interviewer.progress import ProgressCallback, emit_progress
-from job_interviewer.schemas import (
+from interview_local.metrics import calculate_answer_quality
+from interview_local.progress import ProgressCallback, emit_progress
+from interview_local.schemas import (
     AnswerDraft,
     AnswerEvaluation,
     AnswerFlowState,

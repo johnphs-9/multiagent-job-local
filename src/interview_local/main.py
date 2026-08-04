@@ -7,11 +7,11 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from job_interviewer.config import Settings
-from job_interviewer.documents import extract_document
-from job_interviewer.render import render_plan, render_report
-from job_interviewer.schemas import WorkflowOptions
-from job_interviewer.service import (
+from interview_local.config import Settings
+from interview_local.documents import extract_document
+from interview_local.render import render_plan, render_report
+from interview_local.schemas import WorkflowOptions
+from interview_local.service import (
     build_interview_plan,
     check_ollama,
     improve_interview_answers,

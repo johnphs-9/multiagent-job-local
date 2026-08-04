@@ -1,6 +1,6 @@
-from job_interviewer.answer_flow import AnswerImprovementFlow, CrewAIAnswerRunner
-from job_interviewer.config import Settings
-from job_interviewer.schemas import (
+from interview_local.answer_flow import AnswerImprovementFlow, CrewAIAnswerRunner
+from interview_local.config import Settings
+from interview_local.schemas import (
     AnswerDraft,
     AnswerEvaluation,
     CompanyResearch,

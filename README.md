@@ -196,7 +196,7 @@ The direct server command remains available:
 
 ```bash
 source .venv/bin/activate
-python -m uvicorn job_interviewer.api.app:app --host 127.0.0.1 --port 8000
+python -m uvicorn interview_local.api.app:app --host 127.0.0.1 --port 8000
 ```
 
 Open <http://127.0.0.1:8000>. Select **Try with sample files** and the Preview
@@ -210,7 +210,7 @@ Run the API and Vite servers in separate terminals:
 
 ```bash
 source .venv/bin/activate
-python -m uvicorn job_interviewer.api.app:app --reload --port 8000
+python -m uvicorn interview_local.api.app:app --reload --port 8000
 ```
 
 ```bash
@@ -315,7 +315,7 @@ application startup with a configuration error.
 ## Command-line interface
 
 ```bash
-job-interviewer \
+interview-local \
   --jd-file examples/job_description.txt \
   --candidate-file examples/candidate_profile.txt \
   --offline \
@@ -342,7 +342,7 @@ Automated tests mock agent operations and do not call Ollama or public search.
 ├── docs/                         # Local-only product and engineering documentation
 ├── examples/                     # Safe sample inputs
 ├── frontend/                     # React + TypeScript + Vite
-├── src/job_interviewer/
+├── src/interview_local/
 │   ├── api/                      # FastAPI routes and ephemeral job runtime
 │   ├── answer_flow.py            # Bounded evaluator–optimizer Flow
 │   ├── config.py                 # Ollama models and profile policy
