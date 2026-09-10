@@ -1,0 +1,238 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1680" height="1180" viewBox="0 0 1680 1180" role="img" aria-labelledby="title desc">
+  <title id="title">Interview Atelier — technical architecture</title>
+  <desc id="desc">Layered architecture of the local-first agentic interview coach: React browser client, FastAPI application with ephemeral in-memory runtime, CrewAI agent workflows (sequential preparation crew and bounded evaluator-optimizer flow) with deterministic guardrails, local Ollama inference, and optional internet egress for web research.</desc>
+
+  <defs>
+    <marker id="mInk" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0 0 L9 4.5 L0 9 z" fill="#1B211F"/>
+    </marker>
+    <marker id="mInkStart" markerWidth="9" markerHeight="9" refX="1" refY="4.5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+      <path d="M0 0 L9 4.5 L0 9 z" fill="#1B211F"/>
+    </marker>
+    <marker id="mTeal" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0 0 L9 4.5 L0 9 z" fill="#036D92"/>
+    </marker>
+    <marker id="mCoral" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0 0 L9 4.5 L0 9 z" fill="#A45F3F"/>
+    </marker>
+    <style>
+      text { font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif; }
+      .mono { font-family: "IBM Plex Mono", SFMono-Regular, Menlo, Consolas, monospace; }
+      .t-title { font-size: 28px; font-weight: 700; fill: #1B211F; letter-spacing: -0.3px; }
+      .t-sub { font-size: 14px; font-weight: 400; fill: #5F6662; }
+      .t-chip { font-size: 11.5px; font-weight: 600; fill: #1B211F; letter-spacing: 1px; }
+      .t-zone { font-size: 11px; font-weight: 700; fill: #1B211F; letter-spacing: 1.5px; }
+      .t-hdr { font-size: 15px; font-weight: 700; fill: #FFFDF9; }
+      .t-hdrsub { font-size: 11.5px; font-weight: 400; fill: rgba(255,253,249,0.78); }
+      .t-ct { font-size: 14px; font-weight: 700; fill: #1B211F; }
+      .t-ct13 { font-size: 13px; font-weight: 700; fill: #1B211F; }
+      .t-body { font-size: 12px; font-weight: 400; fill: #414945; }
+      .t-small { font-size: 11px; font-weight: 400; fill: #5F6662; }
+      .t-mono { font-size: 11px; font-weight: 500; fill: #5F6662; }
+      .t-eyebrow { font-size: 10.5px; font-weight: 700; fill: #C68148; letter-spacing: 1.3px; }
+      .t-phase { font-size: 12px; font-weight: 700; fill: #1F5552; letter-spacing: 0.6px; }
+      .t-agent { font-size: 12.5px; font-weight: 700; fill: #1B211F; }
+      .t-agentsub { font-size: 11px; font-weight: 400; fill: #5F6662; }
+      .t-guard { font-size: 12px; font-weight: 700; fill: #1B211F; }
+      .t-loop { font-size: 11px; font-weight: 600; fill: #C68148; }
+      .t-flow { font-size: 11.5px; font-weight: 600; fill: #1B211F; }
+      .t-flow-teal { font-size: 11.5px; font-weight: 600; fill: #036D92; }
+      .t-flow-coral { font-size: 11.5px; font-weight: 600; fill: #A45F3F; }
+      .t-legend { font-size: 11.5px; font-weight: 400; fill: #5F6662; }
+      .t-legend-h { font-size: 10.5px; font-weight: 700; fill: #5F6662; letter-spacing: 1.3px; }
+    </style>
+  </defs>
+
+  <rect width="1680" height="1180" fill="#FFFFFF"/>
+
+  <!-- Header -->
+  <text x="64" y="58" class="t-title">Interview Atelier — Technical Architecture</text>
+  <text x="64" y="88" class="t-sub">Local-first agentic interview coach · React SPA + FastAPI + CrewAI + Ollama</text>
+  <rect x="1288" y="42" width="328" height="36" rx="4" fill="#FFFFFF" stroke="#D5D8D3"/>
+  <text x="1452" y="65" text-anchor="middle" class="t-chip">ONE WORKSTATION · ONE PROCESS · NO DATABASE</text>
+
+  <!-- Local workstation boundary -->
+  <rect x="48" y="120" width="1584" height="866" fill="none" stroke="#D5D8D3" stroke-width="1.5" stroke-dasharray="8 6"/>
+  <rect x="64" y="104" width="300" height="32" rx="4" fill="#FFFFFF" stroke="#D5D8D3"/>
+  <text x="214" y="125" text-anchor="middle" class="t-zone">LOCAL WORKSTATION — LOOPBACK ONLY</text>
+
+  <!-- ============ BROWSER ============ -->
+  <rect x="88" y="168" width="320" height="608" rx="4" fill="#FFFFFF" stroke="#D5D8D3"/>
+  <rect x="88" y="168" width="320" height="48" rx="4" fill="#ECEDEA"/>
+  <rect x="88" y="196" width="320" height="20" fill="#ECEDEA"/>
+  <text x="108" y="192" class="t-ct">Browser — React SPA</text>
+  <text x="108" y="208" class="t-mono mono">Vite · TypeScript · 127.0.0.1:8000</text>
+
+  <rect x="108" y="236" width="280" height="140" rx="3" fill="#FFFDF9" stroke="#D5D8D3"/>
+  <text x="124" y="262" class="t-ct13">Evidence intake</text>
+  <text x="124" y="284" class="t-body">· JD file + CV/profile + notes</text>
+  <text x="124" y="304" class="t-body">· company hint · interview focus</text>
+  <text x="124" y="324" class="t-body">· research consent · runtime profile</text>
+  <text x="124" y="348" class="t-small">TXT · MD · PDF · DOCX · ≤ 10 MB each</text>
+
+  <rect x="108" y="396" width="280" height="140" rx="3" fill="#FFFDF9" stroke="#D5D8D3"/>
+  <text x="124" y="422" class="t-ct13">Workspace</text>
+  <text x="124" y="444" class="t-body">· company research + sources</text>
+  <text x="124" y="464" class="t-body">· job fit — strengths, gaps, metrics</text>
+  <text x="124" y="484" class="t-body">· question bank + coached answers</text>
+  <text x="124" y="508" class="t-small">stage-aware job progress · MD/JSON download</text>
+
+  <rect x="108" y="556" width="280" height="140" rx="3" fill="#FFFDF9" stroke="#D5D8D3"/>
+  <text x="124" y="582" class="t-ct13">Session &amp; jobs</text>
+  <text x="124" y="604" class="t-body">· creates ephemeral session</text>
+  <text x="124" y="624" class="t-body">· idempotent job start + polling</text>
+  <text x="124" y="644" class="t-body">· fetch plan / report · MD + JSON</text>
+  <text x="124" y="668" class="t-small">session ID only in sessionStorage</text>
+
+  <text x="248" y="722" text-anchor="middle" class="t-small">no credentials · no document storage in browser</text>
+
+  <!-- ============ APPLICATION ============ -->
+  <rect x="488" y="168" width="1104" height="608" rx="4" fill="#FFFFFF" stroke="#1B211F" stroke-width="1.5"/>
+  <rect x="488" y="168" width="1104" height="56" rx="4" fill="#02225E"/>
+  <rect x="488" y="204" width="1104" height="20" fill="#02225E"/>
+  <text x="520" y="198" class="t-hdr">Application process — Uvicorn + FastAPI</text>
+  <text x="520" y="216" class="t-hdrsub mono">serves frontend/dist + REST API · single Python process · 127.0.0.1:8000</text>
+  <rect x="1372" y="186" width="196" height="26" rx="13" fill="rgba(255,253,249,0.14)"/>
+  <text x="1470" y="203" text-anchor="middle" class="t-hdrsub" style="letter-spacing:0.8px; font-weight:600;">one user · one machine</text>
+
+  <!-- REST API card -->
+  <rect x="520" y="248" width="500" height="116" rx="3" fill="#FFFFFF" stroke="#D5D8D3"/>
+  <text x="540" y="278" class="t-ct">REST API — <tspan class="mono" fill="#5F6662">/api/v1</tspan></text>
+  <text x="540" y="304" class="t-body">· upload validation + safe document extraction</text>
+  <text x="540" y="324" class="t-body">· sessions, plan &amp; answer jobs, status, downloads</text>
+  <text x="540" y="344" class="t-body">· rate limit · idempotency keys · safe public errors · health</text>
+
+  <!-- Runtime card -->
+  <rect x="1076" y="248" width="500" height="116" rx="3" fill="#FFFFFF" stroke="#D5D8D3"/>
+  <text x="1096" y="278" class="t-ct">Ephemeral runtime — in-memory</text>
+  <text x="1096" y="304" class="t-body">· sessions with 60 min idle TTL · idempotency index</text>
+  <text x="1096" y="324" class="t-body">· job records: queued → running → terminal</text>
+  <text x="1096" y="344" class="t-body">· bounded ThreadPoolExecutor — 1 running + 5 queued</text>
+
+  <!-- API to runtime -->
+  <path d="M 1020 306 L 1072 306" fill="none" stroke="#1B211F" stroke-width="2" marker-end="url(#mInk)"/>
+
+  <!-- Agentic orchestration panel -->
+  <rect x="520" y="392" width="1056" height="364" rx="3" fill="#FBF7EE" stroke="#D9BE93"/>
+  <rect x="520" y="392" width="6" height="364" fill="#EDB86C"/>
+  <text x="548" y="418" class="t-eyebrow">AGENT ORCHESTRATION · CREWAI</text>
+  <text x="548" y="440" class="t-ct">Two bounded agent workflows on one local model</text>
+
+  <!-- Phase 1: plan crew -->
+  <text x="548" y="470" class="t-phase">01 · PLAN JOB — SEQUENTIAL SPECIALISTS</text>
+
+  <rect x="544" y="482" width="220" height="60" rx="3" fill="#FFFFFF" stroke="#D5D8D3"/>
+  <rect x="544" y="482" width="4" height="60" fill="#EDB86C"/>
+  <text x="562" y="507" class="t-agent">Identity analyst</text>
+  <text x="562" y="527" class="t-agentsub">company + role from the JD</text>
+
+  <rect x="801" y="482" width="220" height="60" rx="3" fill="#FFFFFF" stroke="#D5D8D3"/>
+  <rect x="801" y="482" width="4" height="60" fill="#EDB86C"/>
+  <text x="819" y="507" class="t-agent">Research analyst</text>
+  <text x="819" y="527" class="t-agentsub">cited company facts · S1…S12</text>
+
+  <rect x="1058" y="482" width="220" height="60" rx="3" fill="#FFFFFF" stroke="#D5D8D3"/>
+  <rect x="1058" y="482" width="4" height="60" fill="#EDB86C"/>
+  <text x="1076" y="507" class="t-agent">JD analyst</text>
+  <text x="1076" y="527" class="t-agentsub">requirements · fit · gaps</text>
+
+  <rect x="1315" y="482" width="220" height="60" rx="3" fill="#FFFFFF" stroke="#D5D8D3"/>
+  <rect x="1315" y="482" width="4" height="60" fill="#EDB86C"/>
+  <text x="1333" y="507" class="t-agent">Interview architect</text>
+  <text x="1333" y="527" class="t-agentsub">typed, capped question set</text>
+
+  <path d="M 764 512 L 797 512" fill="none" stroke="#1B211F" stroke-width="2" marker-end="url(#mInk)"/>
+  <path d="M 1021 512 L 1054 512" fill="none" stroke="#1B211F" stroke-width="2" marker-end="url(#mInk)"/>
+  <path d="M 1278 512 L 1311 512" fill="none" stroke="#1B211F" stroke-width="2" marker-end="url(#mInk)"/>
+
+  <!-- Phase 2: answer flow -->
+  <text x="548" y="584" class="t-phase">02 · ANSWER JOB — EVALUATOR–OPTIMIZER FLOW</text>
+
+  <rect x="605" y="596" width="250" height="60" rx="3" fill="#FFFFFF" stroke="#D5D8D3"/>
+  <rect x="605" y="596" width="4" height="60" fill="#EDB86C"/>
+  <text x="623" y="621" class="t-agent">Answer coach</text>
+  <text x="623" y="641" class="t-agentsub">drafts from evidence ledger E1…En</text>
+
+  <rect x="915" y="596" width="250" height="60" rx="3" fill="#FFFFFF" stroke="#D5D8D3"/>
+  <rect x="915" y="596" width="4" height="60" fill="#EDB86C"/>
+  <text x="933" y="621" class="t-agent">Evaluator</text>
+  <text x="933" y="641" class="t-agentsub">scores 1–5 · flags unsupported claims</text>
+
+  <rect x="1225" y="596" width="250" height="60" rx="3" fill="#FFFFFF" stroke="#D5D8D3"/>
+  <rect x="1225" y="596" width="4" height="60" fill="#EDB86C"/>
+  <text x="1243" y="621" class="t-agent">Answer coach</text>
+  <text x="1243" y="641" class="t-agentsub">revises answers below pass score</text>
+
+  <path d="M 855 626 L 911 626" fill="none" stroke="#1B211F" stroke-width="2" marker-end="url(#mInk)"/>
+  <path d="M 1165 626 L 1221 626" fill="none" stroke="#1B211F" stroke-width="2" marker-end="url(#mInk)"/>
+  <path d="M 1350 656 L 1350 684 L 730 684 L 730 660" fill="none" stroke="#C68148" stroke-width="2" marker-end="url(#mInk)"/>
+  <text x="1040" y="677" text-anchor="middle" class="t-loop">repeat while any answer is below the pass score — hard limit 3 cycles</text>
+
+  <!-- Guardrails -->
+  <rect x="548" y="698" width="1000" height="44" rx="3" fill="#FAF4E8" stroke="#E4D5BC"/>
+  <text x="564" y="716" class="t-guard">Deterministic guardrails around every model call</text>
+  <text x="564" y="734" class="t-small">Pydantic contracts · JSON repair + 1 bounded retry · evidence ledger · untrusted-data rules · fit &amp; quality metrics · Markdown/JSON export</text>
+  <text x="1536" y="748" text-anchor="end" class="t-mono mono">interview-local CLI runs the same agent core</text>
+
+  <!-- ============ OLLAMA ============ -->
+  <rect x="940" y="812" width="652" height="150" rx="4" fill="#FFFFFF" stroke="#036D92" stroke-width="1.5"/>
+  <rect x="940" y="812" width="652" height="44" rx="4" fill="#036D92"/>
+  <rect x="940" y="836" width="652" height="20" fill="#036D92"/>
+  <text x="964" y="840" class="t-hdr">Local model service — Ollama</text>
+  <text x="1568" y="840" text-anchor="end" class="t-hdrsub mono">127.0.0.1:11434 · loopback</text>
+
+  <rect x="964" y="872" width="176" height="30" rx="3" fill="#EAF3F6" stroke="#0387AD"/>
+  <text x="980" y="892" class="t-ct13" style="font-size:12px;">Preview</text>
+  <text x="1124" y="892" text-anchor="end" class="t-mono mono" style="font-size:10.5px;">llama3.2</text>
+
+  <rect x="1152" y="872" width="176" height="30" rx="3" fill="#EAF3F6" stroke="#0387AD"/>
+  <text x="1168" y="892" class="t-ct13" style="font-size:12px;">Demo</text>
+  <text x="1312" y="892" text-anchor="end" class="t-mono mono" style="font-size:10.5px;">gemma4</text>
+
+  <rect x="1340" y="872" width="216" height="30" rx="3" fill="#EAF3F6" stroke="#0387AD"/>
+  <text x="1356" y="892" class="t-ct13" style="font-size:12px;">Deep</text>
+  <text x="1540" y="892" text-anchor="end" class="t-mono mono" style="font-size:10.5px;">gemma4:26b</text>
+
+  <text x="964" y="932" class="t-small">OpenAI-compatible endpoint · LiteLLM adapter · profile token ceilings · 2 retries · hidden reasoning off</text>
+
+  <!-- ============ LEGEND ============ -->
+  <rect x="488" y="812" width="348" height="150" rx="4" fill="#FFFFFF" stroke="#D5D8D3"/>
+  <text x="508" y="840" class="t-legend-h">LEGEND</text>
+  <line x1="508" y1="866" x2="548" y2="866" stroke="#1B211F" stroke-width="2.5" marker-end="url(#mInk)"/>
+  <text x="560" y="870" class="t-legend">app data flow — jobs, results, downloads</text>
+  <line x1="508" y1="894" x2="548" y2="894" stroke="#036D92" stroke-width="2.5" marker-end="url(#mTeal)"/>
+  <text x="560" y="898" class="t-legend">local model inference — loopback</text>
+  <line x1="508" y1="922" x2="548" y2="922" stroke="#A45F3F" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#mCoral)"/>
+  <text x="560" y="926" class="t-legend">optional internet egress</text>
+  <rect x="508" y="944" width="40" height="12" rx="3" fill="#EDB86C" stroke="#C68148"/>
+  <text x="560" y="954" class="t-legend">agentic orchestration — CrewAI</text>
+
+  <!-- ============ OPTIONAL EGRESS (outside boundary) ============ -->
+  <rect x="88" y="1012" width="430" height="124" rx="4" fill="#F9F1EC" stroke="#A45F3F" stroke-width="1.5" stroke-dasharray="7 5"/>
+  <text x="108" y="1042" class="t-ct" fill="#A45F3F">Optional internet egress</text>
+  <text x="108" y="1066" class="t-body">public text + news search — DDGS</text>
+  <text x="108" y="1086" class="t-body">only the company name + search terms leave the machine</text>
+  <text x="108" y="1108" class="t-small">web results are treated as untrusted evidence</text>
+
+  <!-- ============ FLOW ARROWS ============ -->
+  <!-- 1 browser <-> app -->
+  <path d="M 412 300 L 484 300" fill="none" stroke="#1B211F" stroke-width="2.2" marker-start="url(#mInkStart)" marker-end="url(#mInk)"/>
+  <text x="448" y="300" text-anchor="middle" class="t-flow" transform="rotate(-90 448 300)">① HTTP · uploads · jobs · downloads</text>
+
+  <!-- 3 runtime -> agentic -->
+  <path d="M 1240 364 L 1240 388" fill="none" stroke="#1B211F" stroke-width="2.2" marker-end="url(#mInk)"/>
+  <text x="1228" y="384" text-anchor="end" class="t-flow">③ execute in worker thread</text>
+
+  <!-- 6 agentic -> runtime -->
+  <path d="M 1390 392 L 1390 368" fill="none" stroke="#1B211F" stroke-width="2.2" marker-end="url(#mInk)"/>
+  <text x="1404" y="384" class="t-flow">⑥ store typed result</text>
+
+  <!-- 4 agentic <-> ollama -->
+  <path d="M 1266 776 L 1266 808" fill="none" stroke="#036D92" stroke-width="2.6" marker-end="url(#mTeal)"/>
+  <text x="1282" y="798" class="t-flow-teal">④ model calls · prompts ⇄ structured JSON</text>
+
+  <!-- 5 research -> egress (crosses boundary) -->
+  <path d="M 860 776 L 860 1074 L 522 1074" fill="none" stroke="#A45F3F" stroke-width="2.4" stroke-dasharray="7 5" marker-end="url(#mCoral)"/>
+  <text x="874" y="1000" class="t-flow-coral">⑤ opt-in web research</text>
+
+</svg>

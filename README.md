@@ -51,7 +51,7 @@ enforce structured outputs and workflow limits around the local model.
 
 ## Local architecture
 
-![Detailed local HTML deployment architecture](assets/architecture/local-html-deployment-architecture.svg)
+![Detailed local HTML deployment architecture](assets/architecture/technical-architecture.svg)
 
 The browser loads the compiled React application from FastAPI on
 `http://127.0.0.1:8000`. FastAPI validates uploads, owns ephemeral sessions and jobs,
